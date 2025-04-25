@@ -25,7 +25,7 @@ export default function CreateRequestPage() {
         try {
             const token = await getAccessTokenSilently();
             await axios.post(
-                '/hotel-booking/api/requests',
+                '/api/requests',
                 form, {
                 headers: {
                     Authorization: `Bearer ${token}`,

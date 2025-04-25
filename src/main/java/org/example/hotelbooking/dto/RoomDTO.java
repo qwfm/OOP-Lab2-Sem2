@@ -12,6 +12,6 @@ public class RoomDTO {
     private Long id;
     private String type;
     private Integer capacity;
-    private BigDecimal price_per_night;
+    private BigDecimal pricePerNight;
     private String status;
 }

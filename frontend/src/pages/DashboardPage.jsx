@@ -22,7 +22,7 @@ export default function DashboardPage() {
     const fetchRooms = async () => {
       try {
         const token = await getAccessTokenSilently();
-        const { data } = await axios.get("/hotel-booking/api/rooms", {
+        const { data } = await axios.get("/api/rooms/all", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRooms(data);
@@ -75,8 +75,8 @@ export default function DashboardPage() {
                 <div className="card">
                   <div className="card-body">
                     <h5 className="card-title">
-                      {room.type} — №{room.roomNumber}
-                    </h5>
+                      {room.type} — №{room.id
+                    }</h5>
                     <p className="card-text">
                       Місць: {room.capacity}
                       <br />

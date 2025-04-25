@@ -35,6 +35,7 @@ public class RequestController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         UserDTO user = userService.findOrCreate(jwt);
+        System.out.printf(">>> user.id=%s, user.role=%s%n", user.getId(), user.getRole());
         List<RequestDTO> list =
                 "admin".equalsIgnoreCase(user.getRole())
                         ? requestService.getAll()

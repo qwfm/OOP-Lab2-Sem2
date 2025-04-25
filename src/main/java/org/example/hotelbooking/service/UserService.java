@@ -17,13 +17,23 @@ public class UserService {
     public UserDTO findOrCreate(Jwt jwt) {
         String email = jwt.getClaim("email");
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> userRepository.save(
-                        User.builder()
-                                .email(email)
-                                .name("new user")
-                                .role("client")
-                                .build()
-                ));
-        return userMapper.toDto(user);
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(email)
+                            .name("new user")
+                            .role("client")
+                            .build();
+                    return userRepository.save(newUser);
+                });
+        System.out.printf(">>> entity.id=%s, entity.role=%s, entity.email=%s%n",
+                user.getId(), user.getRole(), user.getEmail());
+
+        UserDTO dto = userMapper.toDto(user);
+
+        // **debug**: перевіримо, що дійшло вже в DTO
+        System.out.printf(">>> dto.id=%s, dto.role=%s, dto.email=%s%n",
+                dto.getId(), dto.getRole(), dto.getEmail());
+
+        return dto;
     }
 }

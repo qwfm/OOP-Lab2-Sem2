@@ -19,10 +19,10 @@ export default function CreateBookingPage() {
             try {
                 const token = await getAccessTokenSilently();
                 const [reqRes, roomRes] = await Promise.all([
-                    axios.get('/hotel-booking/api/requests', {
+                    axios.get('/api/requests', {
                         headers: { Authorization: `Bearer ${token}` }
                     }),
-                    axios.get('/hotel-booking/api/rooms', {
+                    axios.get('/api/rooms', {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                 ]);
@@ -59,11 +59,13 @@ export default function CreateBookingPage() {
         try {
             const token = await getAccessTokenSilently();
             await axios.post(
-                '/hotel-booking/api/bookings',
+                '/api/bookings',
                 {
                     requestId: Number(selectedRequestId),
                     roomId: Number(selectedRoomId),
-                    totalPrice: totalPrice
+                    totalPrice: totalPrice,
+                    checkIn:    requests.find(r => r.id === +selectedRequestId)?.checkIn,
+                    checkOut:   requests.find(r => r.id === +selectedRequestId)?.checkOut,
                 },
                 {
                     headers: {

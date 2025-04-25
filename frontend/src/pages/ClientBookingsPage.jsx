@@ -14,7 +14,7 @@ export default function ClientBookingsPage() {
         const fetchMyBookings = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await axios.get('/hotel-booking/api/bookings/me', {
+                const res = await axios.get('/api/bookings', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setBookings(res.data);
@@ -30,7 +30,7 @@ export default function ClientBookingsPage() {
     const handleCancel = async (id) => {
         try {
             const token = await getAccessTokenSilently();
-            await axios.delete(`/hotel-booking/api/bookings/${id}`, {
+            await axios.delete(`/api/bookings/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             // Після успішного видалення прибираємо бронювання з локального стану

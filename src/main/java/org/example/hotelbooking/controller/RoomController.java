@@ -26,6 +26,13 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<RoomDTO>> listAll() {
+        List<RoomDTO> rooms = roomService.getAll();
+        return ResponseEntity.ok(rooms);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<RoomDTO> getOne(@PathVariable Long id) {
         RoomDTO room = roomService.getById(id);

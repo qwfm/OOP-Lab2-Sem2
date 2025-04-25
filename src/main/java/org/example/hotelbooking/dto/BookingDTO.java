@@ -11,9 +11,10 @@ import java.time.LocalDate;
 @Builder
 public class BookingDTO {
     private Long id;
+    private Long requestId;
     private Long roomId;
+    private BigDecimal totalPrice;
     private Long clientId;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private BigDecimal totalPrice;
 }

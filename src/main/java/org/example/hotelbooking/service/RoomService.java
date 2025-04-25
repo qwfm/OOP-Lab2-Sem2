@@ -23,7 +23,9 @@ public class RoomService {
     }
 
     public List<RoomDTO> getAll() {
-        return roomRepository.findAll().stream()
+        List<Room> rooms = roomRepository.findAll();
+        rooms.forEach(room -> System.out.println("Room from DB: " + room));
+        return rooms.stream()
                 .map(roomMapper::toDto)
                 .toList();
     }

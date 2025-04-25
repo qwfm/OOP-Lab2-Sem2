@@ -15,7 +15,7 @@ export function useUserRole() {
 
             try {
                 const token = await getAccessTokenSilently();
-                const response = await fetch('/hotel-booking/api/users/me', {
+                const response = await fetch('/api/users/me', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await response.json();

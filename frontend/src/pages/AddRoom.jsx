@@ -23,7 +23,7 @@ function AddRoomPage() {
     try {
       const token = await getAccessTokenSilently();
 
-      const response = await fetch("/hotel-booking/api/rooms", {
+      const response = await fetch("/api/rooms", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

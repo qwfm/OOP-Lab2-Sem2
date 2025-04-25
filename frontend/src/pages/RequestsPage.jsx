@@ -12,7 +12,7 @@ const RequestsPage = () => {
         const fetchRequests = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                const response = await axios.get('/hotel-booking/api/requests', {
+                const response = await axios.get('/api/requests', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

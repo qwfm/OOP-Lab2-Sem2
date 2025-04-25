@@ -11,7 +11,7 @@ export default function BookingsListPage() {
         const fetchBookings = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await axios.get('/hotel-booking/api/bookings', {
+                const res = await axios.get('/api/bookings', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setBookings(res.data);
@@ -25,7 +25,7 @@ export default function BookingsListPage() {
     const handleDeleteBooking = async (id) => {
         try {
             const token = await getAccessTokenSilently();
-            await axios.delete(`/hotel-booking/api/bookings/${id}`, {
+            await axios.delete(`/api/bookings/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBookings(bookings.filter(b => b.id !== id));
