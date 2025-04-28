@@ -13,9 +13,9 @@ public class Room {
 
     private String type;
     private Integer capacity;
-
     @Column(name = "price_per_night")
     private BigDecimal pricePerNight;
+
 
     private String status;
 }

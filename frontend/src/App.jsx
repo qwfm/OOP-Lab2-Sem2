@@ -4,10 +4,11 @@ import DashboardPage from './pages/DashboardPage';
 import AddRoomPage from './pages/AddRoom';
 import ProtectedRoute from './components/ProtectedRoute';
 import CreateBookingPage from "./pages/CreateBookingPage.jsx";
-import BookingsListPage from "./pages/BookingsListPage.jsx";
+import AdminBookingsListPage from "./pages/AdminBookingsListPage.jsx";
 import ClientBookingsPage from "./pages/ClientBookingsPage.jsx";
 import CreateRequestPage from "./pages/CreateRequestPage.jsx";
-import RequestsPage from "./pages/RequestsPage.jsx";
+import RequestsPage from "./pages/ClientRequestsPage.jsx";
+import AdminRequestsPage from "./pages/AdminRequestsPage.jsx";
 
 function App() {
 
@@ -42,7 +43,7 @@ function App() {
                 path="/bookings"
                 element={
                     <ProtectedRoute requiredRole="admin">
-                        <BookingsListPage />
+                        <AdminBookingsListPage />
                     </ProtectedRoute>
                 }
             />
@@ -68,6 +69,14 @@ function App() {
                            <RequestsPage />
                        </ProtectedRoute>
                    }
+            />
+            <Route
+                path="/admin/requests"
+                element={
+                    <ProtectedRoute requiredRole="admin">
+                        <AdminRequestsPage />
+                    </ProtectedRoute>
+                }
             />
         </Routes>
     );

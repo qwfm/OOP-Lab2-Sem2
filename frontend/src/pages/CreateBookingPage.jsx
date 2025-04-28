@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 export default function CreateBookingPage() {
     const { getAccessTokenSilently } = useAuth0();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // якщо прийшла навігація з AdminRequestsPage:
+    const preselectedRequest = location.state?.requestId ?? '';
 
     const [requests, setRequests] = useState([]);
     const [rooms, setRooms] = useState([]);
-    const [selectedRequestId, setSelectedRequestId] = useState('');
+    const [selectedRequestId, setSelectedRequestId] = useState(preselectedRequest);
     const [selectedRoomId, setSelectedRoomId] = useState('');
     const [totalPrice, setTotalPrice] = useState(0);
     const [error, setError] = useState(null);
@@ -27,10 +31,8 @@ export default function CreateBookingPage() {
                     })
                 ]);
 
-                console.log('requests response data:', reqRes.data);
-                // Ensure data is an array
                 const allRequests = Array.isArray(reqRes.data) ? reqRes.data : [];
-                setRequests(allRequests.filter(r => r.status?.toUpperCase() === 'PENDING'));
+                setRequests(allRequests.filter(r => r.status === 'PENDING'));
                 setRooms(Array.isArray(roomRes.data) ? roomRes.data : []);
             } catch (e) {
                 console.error('Failed to load data:', e);
@@ -40,14 +42,20 @@ export default function CreateBookingPage() {
         fetchData();
     }, [getAccessTokenSilently]);
 
-    // Recompute total price when selection changes
+    useEffect(() => {
+        if (preselectedRequest && requests.some(r => r.id === preselectedRequest)) {
+            setSelectedRequestId(preselectedRequest);
+        }
+    }, [preselectedRequest, requests]);
+
     useEffect(() => {
         const req = requests.find(r => r.id === Number(selectedRequestId));
         const room = rooms.find(r => r.id === Number(selectedRoomId));
         if (req && room) {
-            const checkIn = new Date(req.checkIn);
-            const checkOut = new Date(req.checkOut);
-            const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const nights = Math.ceil(
+                (new Date(req.checkOut) - new Date(req.checkIn)) /
+                (1000 * 60 * 60 * 24)
+            );
             setTotalPrice(nights * room.pricePerNight);
         } else {
             setTotalPrice(0);
@@ -63,7 +71,7 @@ export default function CreateBookingPage() {
                 {
                     requestId: Number(selectedRequestId),
                     roomId: Number(selectedRoomId),
-                    totalPrice: totalPrice,
+                    totalPrice,
                     checkIn:    requests.find(r => r.id === +selectedRequestId)?.checkIn,
                     checkOut:   requests.find(r => r.id === +selectedRequestId)?.checkOut,
                 },
@@ -97,12 +105,11 @@ export default function CreateBookingPage() {
                         <option value="">-- Виберіть запит --</option>
                         {requests.map(req => (
                             <option key={req.id} value={req.id}>
-                                #{req.id} — {req.roomType}, {req.checkIn} → {req.checkOut}
+                                #{req.id} — {req.roomType}, {req.checkIn} → {req.checkOut}, ClientId: {req.clientId}, Guests: {req.guests}
                             </option>
                         ))}
                     </select>
                 </div>
-
                 <div className="mb-3">
                     <label className="form-label">Обрати кімнату</label>
                     <select
@@ -119,11 +126,9 @@ export default function CreateBookingPage() {
                         ))}
                     </select>
                 </div>
-
                 <div className="mb-3">
                     <p>Загальна ціна: <strong>{totalPrice}₴</strong></p>
                 </div>
-
                 <button type="submit" className="btn btn-primary w-100">
                     Створити бронювання
                 </button>

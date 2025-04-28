@@ -6,6 +6,7 @@ import org.example.hotelbooking.dto.UserDTO;
 import org.example.hotelbooking.service.RequestService;
 import org.example.hotelbooking.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -58,5 +59,42 @@ public class RequestController {
             return ResponseEntity.status(403).build();
         }
         return ResponseEntity.ok(req);
+    }
+
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<RequestDTO> confirmRequest(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UserDTO user = userService.findOrCreate(jwt);
+        if (!"admin".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+        RequestDTO dto = requestService.confirm(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<RequestDTO> rejectRequest(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UserDTO user = userService.findOrCreate(jwt);
+        if (!"admin".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+        RequestDTO dto = requestService.reject(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<RequestDTO>> listAllRequests(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UserDTO user = userService.findOrCreate(jwt);
+        if (!"admin".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(requestService.getAll());
     }
 }

@@ -40,4 +40,12 @@ public class RequestService {
         req.setStatus("CONFIRMED");
         return requestMapper.toDto(requestRepository.save(req));
     }
+
+    public RequestDTO reject(Long id) {
+        Request req = requestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found: " + id));
+        req.setStatus("REJECTED");
+        Request saved = requestRepository.save(req);
+        return requestMapper.toDto(saved);
+    }
 }

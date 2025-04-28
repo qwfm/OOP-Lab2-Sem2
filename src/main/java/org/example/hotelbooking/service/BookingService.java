@@ -2,6 +2,7 @@ package org.example.hotelbooking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.hotelbooking.dto.BookingDTO;
+import org.example.hotelbooking.dto.RequestDTO;
 import org.example.hotelbooking.entity.Booking;
 import org.example.hotelbooking.mappers.BookingMapper;
 import org.example.hotelbooking.repository.BookingRepository;
@@ -18,10 +19,12 @@ public class BookingService {
     private final RequestService requestService;
 
     public BookingDTO create(BookingDTO dto) {
-        requestService.confirm(dto.getId());
+        RequestDTO confirmedRequest = requestService.confirm(dto.getRequestId());
         roomService.occupy(dto.getRoomId());
-        Booking entity = bookingMapper.toEntity(dto);
-        Booking saved = bookingRepository.save(entity);
+        Booking bookingEntity = bookingMapper.toEntity(dto);
+        bookingEntity.setRequestId(dto.getRequestId());
+        bookingEntity.setClientId(dto.getClientId());
+        Booking saved = bookingRepository.save(bookingEntity);
         return bookingMapper.toDto(saved);
     }
 
