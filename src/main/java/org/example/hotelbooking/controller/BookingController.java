@@ -24,7 +24,6 @@ public class BookingController {
             @RequestBody BookingDTO dto,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        // Встановлюємо clientId із email-у
         UserDTO user = userService.findOrCreate(jwt);
         dto.setClientId(user.getId());
         BookingDTO created = bookingService.create(dto);

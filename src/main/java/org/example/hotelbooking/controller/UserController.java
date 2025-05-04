@@ -19,4 +19,10 @@ public class UserController {
         UserDTO user = userService.findOrCreate(jwt);
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> byId(@PathVariable Long id) {
+        UserDTO user = userService.getById(id);
+        return ResponseEntity.ok(user);
+    }
 }

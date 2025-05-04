@@ -10,7 +10,7 @@ export function useUserRole() {
         const fetchRole = async () => {
             if (!isAuthenticated) {
                 setIsLoading(false);
-                return;
+                return; 
             }
 
             try {

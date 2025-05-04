@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export default function AdminBookingsListPage() {
     const { getAccessTokenSilently } = useAuth0();
     const [bookings, setBookings] = useState([]);
     const [error, setError] = useState('');
 
-    // modal for request
+    // modals
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [requestDetails, setRequestDetails] = useState(null);
 
-    // modal for room
     const [showRoomModal, setShowRoomModal] = useState(false);
     const [roomDetails, setRoomDetails] = useState(null);
+
+    const [showUserModal, setShowUserModal] = useState(false);
+    const [userDetails, setUserDetails] = useState(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -56,13 +58,26 @@ export default function AdminBookingsListPage() {
         }
     };
 
+    const handleShowUser = async (userId) => {
+        try {
+            const token = await getAccessTokenSilently();
+            const res = await axios.get(`/api/users/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserDetails(res.data);
+            setShowUserModal(true);
+        } catch {
+            alert('Не вдалося завантажити дані користувача');
+        }
+    };
+
     const handleDeleteBooking = async (id) => {
         try {
             const token = await getAccessTokenSilently();
             await axios.delete(`/api/bookings/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setBookings(bookings.filter(b => b.id !== id));
+            setBookings(prev => prev.filter(b => b.id !== id));
         } catch {
             setError('Не вдалося видалити бронювання');
         }
@@ -76,7 +91,7 @@ export default function AdminBookingsListPage() {
                 <thead>
                 <tr>
                     <th>ID броні</th>
-                    <th>ID клієнта</th>
+                    <th>Клієнт</th>
                     <th>ID запиту</th>
                     <th>Room ID</th>
                     <th>В'їзд</th>
@@ -89,7 +104,14 @@ export default function AdminBookingsListPage() {
                 {bookings.map(b => (
                     <tr key={b.id}>
                         <td>{b.id}</td>
-                        <td>{b.clientId}</td>
+                        <td>
+                            <button
+                                className="btn btn-link p-0"
+                                onClick={() => handleShowUser(b.clientId)}
+                            >
+                                {b.clientId}
+                            </button>
+                        </td>
                         <td>
                             <button
                                 className="btn btn-link p-0"
@@ -122,64 +144,100 @@ export default function AdminBookingsListPage() {
                 </tbody>
             </table>
 
-            {/* Модал деталей запиту */}
+            {/* Request Modal */}
             {showRequestModal && requestDetails && (
                 <>
-                <div
-                    className="modal-backdrop fade show"
-                    onClick={() => setShowRequestModal(false)}
-                />
-                <div className="modal fade show d-block" tabIndex="-1">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Деталі запиту #{requestDetails.id}</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setShowRequestModal(false)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <p><strong>Клієнт:</strong> {requestDetails.clientId}</p>
-                                <p><strong>Тип:</strong> {requestDetails.roomType}</p>
-                                <p><strong>Гостей:</strong> {requestDetails.guests}</p>
-                                <p><strong>Статус:</strong> {requestDetails.status}</p>
-                                <p><strong>Заїзд:</strong> {requestDetails.checkIn}</p>
-                                <p><strong>Виїзд:</strong> {requestDetails.checkOut}</p>
+                    <div
+                        className="modal-backdrop fade show"
+                        onClick={() => setShowRequestModal(false)}
+                    />
+                    <div className="modal fade show d-block" tabIndex="-1">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        Деталі запиту #{requestDetails.id}
+                                    </h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowRequestModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    <p><strong>Клієнт:</strong> {requestDetails.clientId}</p>
+                                    <p><strong>Тип:</strong> {requestDetails.roomType}</p>
+                                    <p><strong>Гостей:</strong> {requestDetails.guests}</p>
+                                    <p><strong>Статус:</strong> {requestDetails.status}</p>
+                                    <p><strong>Заїзд:</strong> {requestDetails.checkIn}</p>
+                                    <p><strong>Виїзд:</strong> {requestDetails.checkOut}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 </>
             )}
 
-            {/* Модал деталей кімнати */}
-            {showRoomModal && roomDetails && (<>
-                <div
-                    className="modal-backdrop fade show"
-                    onClick={() => setShowRoomModal(false)}
-                />
-                <div className="modal fade show d-block" tabIndex="-1">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Деталі кімнати №{roomDetails.id}</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setShowRoomModal(false)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <p><strong>Клас:</strong> {roomDetails.type}</p>
-                                <p><strong>Місць:</strong> {roomDetails.capacity}</p>
-                                <p><strong>Ціна за ніч:</strong> {roomDetails.pricePerNight}₴</p>
-                                <p><strong>Статус:</strong> {roomDetails.status}</p>
+            {/* Room Modal */}
+            {showRoomModal && roomDetails && (
+                <>
+                    <div
+                        className="modal-backdrop fade show"
+                        onClick={() => setShowRoomModal(false)}
+                    />
+                    <div className="modal fade show d-block" tabIndex="-1">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        Деталі кімнати №{roomDetails.id}
+                                    </h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowRoomModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    <p><strong>Клас:</strong> {roomDetails.type}</p>
+                                    <p><strong>Місць:</strong> {roomDetails.capacity}</p>
+                                    <p><strong>Ціна за ніч:</strong> {roomDetails.pricePerNight}₴</p>
+                                    <p><strong>Статус:</strong> {roomDetails.status}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </>
+            )}
+
+            {/* User Modal */}
+            {showUserModal && userDetails && (
+                <>
+                    <div
+                        className="modal-backdrop fade show"
+                        onClick={() => setShowUserModal(false)}
+                    />
+                    <div className="modal fade show d-block" tabIndex="-1">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        Дані користувача #{userDetails.id}
+                                    </h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowUserModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    <p><strong>Email:</strong> {userDetails.email}</p>
+                                    <p><strong>Ім’я:</strong> {userDetails.name}</p>
+                                    <p><strong>Роль:</strong> {userDetails.role}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </>
             )}
         </div>

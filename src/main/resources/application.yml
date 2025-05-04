@@ -16,9 +16,16 @@ spring:
       ddl-auto: none
     show-sql: true
   liquibase:
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    contexts: development, production
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: https://dev-yn2m1l5yklr21ie4.eu.auth0.com/.well-known/jwks.json
+logging:
+  level:
+    org:
+      example:
+        hotelbooking=DEBUG:
